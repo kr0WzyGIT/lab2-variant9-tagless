@@ -1,41 +1,45 @@
-# ЛР2 — Tagless Final (Вариант 9: Склад заказов)
+# Лабораторная работа 2
 
-Переработка ЛР1: та же предметная область, но эффекты описаны через **tagless-алгебры** `F[_]` (Cats Effect).
+## Тема
 
-## Отличие от ЛР1
+Tagless Final.
 
-| ЛР1 | ЛР2 |
-|-----|-----|
-| Свои `Reader` / `Writer` / `State` / `IO` | Алгебры `trait XxxAlg[F[_]]` |
-| Логика в `State.run` / `Writer(...)` | `WarehouseService[F]` — только `F` через алгебры |
-| `WarehouseApp` вызывает `processOrder` напрямую | `program[F[_]: Sync](using ...)` + интерпретаторы |
+## Вариант
 
-## Структура
+Вариант 9 — склад заказов.
 
-- `domain/algebra` — tagless-интерфейсы (`WarehouseReaderAlg`, `WarehouseLoggerAlg`, `WarehouseStateAlg`, `ConsoleAlg`);
-- `domain/WarehouseService.scala` — бизнес-логика **в `F[_]`**;
-- `infrastructure` — интерпретации (конфиг, `Ref` для состояния и лога, `Console`);
-- `app/WarehouseApp.scala` — сценарий с `program[F[_]: Sync](using ...)`;
-- `src/test` — 4 обязательных кейса.
+## Описание
 
-## Запуск
+В этой лабораторной работе реализована простая программа для работы со складом заказов.
+
+В проекте используется подход Tagless Final. Основная логика программы отделена от конкретной реализации эффектов.
+
+## Что есть в проекте
+
+- описание предметной области;
+- сервис для работы с заказами;
+- алгебры для чтения, записи, логирования и состояния;
+- интерпретаторы;
+- тесты.
+
+## Структура проекта
+
+```text
+src/main/scala/app
+src/main/scala/domain
+src/main/scala/domain/algebra
+src/main/scala/infrastructure
+src/test/scala
+```
+
+## Запуск программы
 
 ```bash
 sbt run
-sbt test
 ```
 
-## Ключевой паттерн (как на лекции)
+## Запуск тестов
 
-```scala
-def program[F[_]: Sync](using
-    reader: WarehouseReaderAlg[F],
-    logger: WarehouseLoggerAlg[F],
-    state: WarehouseStateAlg[F],
-    console: ConsoleAlg[F]
-): F[Unit] = ...
-
-given WarehouseReaderAlg[IO] = ReaderInterpreter[IO](config)
-// ...
-program[IO].unsafeRunSync()
+```bash
+sbt test
 ```
